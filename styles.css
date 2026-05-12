@@ -8,6 +8,7 @@
 .super-add-task-modal .setting-item {
     display: block;
     border: none;
+    margin-bottom: 8px;
 }
 
 .super-add-task-modal .setting-item-info {
@@ -100,7 +101,6 @@
 
 .super-add-template-header {
     font-weight: 600;
-    color: var(--text-accent);
     margin-bottom: 8px;
     padding: 4px 8px;
     background-color: var(--interactive-accent);
@@ -124,10 +124,6 @@
 .super-add-task-modal h2 {
     margin-top: 0;
     margin-bottom: 15px;
-}
-
-.super-add-task-modal .setting-item {
-    margin-bottom: 8px;
 }
 
 .super-add-task-modal .setting-item-description {
