@@ -1,7 +1,7 @@
 {
 	"id": "super-add",
 	"name": "SuperAdd",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"minAppVersion": "1.4.0",
 	"description": "Create tasks with natural language processing in Obsidian.",
 	"author": "Imed Ghomari",

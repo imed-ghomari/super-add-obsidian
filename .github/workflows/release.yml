@@ -6,6 +6,9 @@ on:
       - '*'
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 permissions:
   contents: write
   id-token: write
@@ -17,12 +20,14 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
 
       - name: Install dependencies
@@ -33,7 +38,11 @@ jobs:
 
       - name: Verify manifest version matches release tag
         run: |
-          test "$(node -p "require('./manifest.json').version")" = "${{ github.ref_name }}"
+          MANIFEST_VERSION="$(node -p "require('./manifest.json').version")"
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          echo "Manifest version: ${MANIFEST_VERSION}"
+          echo "Tag version: ${TAG_VERSION}"
+          test "${MANIFEST_VERSION}" = "${TAG_VERSION}"
 
       - name: Create GitHub release and upload assets
         uses: softprops/action-gh-release@v2
