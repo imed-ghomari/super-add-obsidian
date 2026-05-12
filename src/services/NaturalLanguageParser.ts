@@ -524,7 +524,8 @@ export class NaturalLanguageParser {
         // Custom fields
         if (parsed.customFields && Object.keys(parsed.customFields).length > 0) {
             for (const [fieldName, fieldValue] of Object.entries(parsed.customFields)) {
-                previewItems.push({ text: `${fieldName}: ${fieldValue}` });
+                const fieldText = Array.isArray(fieldValue) ? fieldValue.join(', ') : String(fieldValue);
+                previewItems.push({ text: `${fieldName}: ${fieldText}` });
             }
         }
         

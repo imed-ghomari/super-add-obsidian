@@ -22,7 +22,7 @@ export class LinkSuggestModal extends FuzzySuggestModal<TFile> {
 
     // Override to customize the modal title
     onOpen() {
-        super.onOpen();
+        void super.onOpen();
         this.modalEl.querySelector('.modal-title')?.setText('Select a file to link');
     }
 }

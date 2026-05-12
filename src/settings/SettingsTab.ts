@@ -49,7 +49,7 @@ export class SuperAddSettingsTab extends PluginSettingTab {
         containerEl.empty();
 
         new Setting(containerEl)
-            .setName('Super Add Settings')
+            .setName('Super Add')
             .setHeading();
 
         this.createCustomFieldSettings(containerEl);

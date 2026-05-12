@@ -1,4 +1,4 @@
-import { App, ButtonComponent, MarkdownRenderer, Modal, Setting, TextAreaComponent, TFile, parseYaml } from 'obsidian';
+import { App, ButtonComponent, Component, MarkdownRenderer, Modal, Setting, TextAreaComponent, TFile, parseYaml } from 'obsidian';
 import SuperAddPlugin from '../../main';
 import { FolderSuggestModal } from './FolderSuggestModal';
 import { LinkSuggestModal } from './LinkSuggestModal';
@@ -41,6 +41,7 @@ export class TaskCreationModal extends Modal {
     private templateData: Record<string, FrontmatterValue> = {};
     private templateFields: string[] = [];
     private inputEl!: TextAreaComponent;
+    private markdownComponent = new Component();
 
     constructor(app: App, plugin: SuperAddPlugin, options: TaskCreationOptions = {}) {
         super(app);
@@ -56,6 +57,7 @@ export class TaskCreationModal extends Modal {
 
     onOpen() {
         const { contentEl } = this;
+        this.markdownComponent.load();
         contentEl.createEl('h2', { text: 'Create Task with Natural Language' });
         this.createNaturalLanguageInput(contentEl);
         this.createPreviewSection(contentEl);
@@ -64,6 +66,7 @@ export class TaskCreationModal extends Modal {
     }
 
     onClose() {
+        this.markdownComponent.unload();
         this.contentEl.empty();
     }
 
@@ -159,7 +162,7 @@ export class TaskCreationModal extends Modal {
                 return;
             }
 
-            const parsed = parseYaml(frontmatterMatch[1]);
+            const parsed: unknown = parseYaml(frontmatterMatch[1]);
             this.templateData = this.toFrontmatterRecord(parsed);
             this.templateFields = Object.keys(this.templateData);
         } catch (error: unknown) {
@@ -188,7 +191,7 @@ export class TaskCreationModal extends Modal {
             const detailsEl = this.previewEl.createEl('div', { cls: 'super-add-preview-details' });
             detailsEl.createEl('strong', { text: 'Details: ' });
             const detailsContent = detailsEl.createDiv({ cls: 'super-add-preview-details-content' });
-            await MarkdownRenderer.render(this.app, this.parsedData.details, detailsContent, '', this.plugin);
+            await MarkdownRenderer.render(this.app, this.parsedData.details, detailsContent, '', this.markdownComponent);
         }
 
         if (this.parsedData.template && this.parsedData.template !== this.selectedTemplate) {
