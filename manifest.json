@@ -1,9 +1,9 @@
 {
 	"id": "super-add",
 	"name": "SuperAdd",
-	"version": "1.0.5",
+	"version": "1.0.6",
 	"minAppVersion": "1.4.0",
-	"description": "Create tasks with natural language processing",
+	"description": "Create tasks with natural language processing.",
 	"author": "Imed Ghomari",
 	"authorUrl": "https://imed-ghomari.github.io/portfolio/personal-projects/",
 	"isDesktopOnly": false
