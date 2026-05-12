@@ -59,4 +59,8 @@ npm run dev   # watch
 npm run build # production
 ```
 
+## Credits
+
+Core QuickAdd-style functionality in this plugin was extracted and adapted from [tasknotes](https://github.com/callumalpass/tasknotes).
+
 MIT License.
