@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-super-add",
-	"version": "1.0.8",
+	"version": "1.0.9",
 	"description": "Create tasks with natural language processing in Obsidian.",
 	"main": "main.js",
 	"scripts": {

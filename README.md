@@ -26,15 +26,8 @@ Create richly structured tasks from a single natural language line. SuperAdd rec
 - Custom date/datetime properties use the same recognition and reset correctly afterward.
 - Recurrence is recognized from natural phrases (e.g., “every week”, “every second Monday”) into RRULE.
 
-## Examples
-
-- “Write report due tomorrow 14:00 estimate 45m #work context office”
-- “Team sync meeting next Fri 3pm recurrence every week”
-- “Project kickoff status open priority high context client-office”
-
 ## Configuration
 
-- **Default folder** for created notes.
 - **Task management properties**: set the field names for due and recurrence.
 - **Custom properties**: add/edit types, defaults, and optional regex/defined values.
 - **Templates**: pick markdown files with frontmatter; their keys define desired frontmatter.
@@ -50,14 +43,6 @@ Create richly structured tasks from a single natural language line. SuperAdd rec
 - Properties not filled: check the property names in Settings match your input phrasing.
 - Template not applied: verify the template is selected/recognized and has frontmatter.
 - Date not parsed: try more explicit phrases (e.g., “tomorrow 18:00”, “next Monday morning”).
-
-## Build / Dev
-
-```bash
-npm install
-npm run dev   # watch
-npm run build # production
-```
 
 ## Credits
 
