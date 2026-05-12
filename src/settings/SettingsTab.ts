@@ -1,9 +1,7 @@
-import { App, PluginSettingTab, Setting, TFile, FuzzySuggestModal, Notice } from 'obsidian';
+import { App, FuzzySuggestModal, Notice, PluginSettingTab, Setting, TFile } from 'obsidian';
 import SuperAddPlugin from '../../main';
-import { SuperAddSettings, Template, CustomField } from '../settings';
+import { CustomField, Template } from '../settings';
 import { CustomFieldModal } from '../modals/CustomFieldModal';
-
-// TemplateSelectionModal is defined in this file, so no import needed
 
 class TemplateSelectionModal extends FuzzySuggestModal<TFile> {
     plugin: SuperAddPlugin;
@@ -13,7 +11,7 @@ class TemplateSelectionModal extends FuzzySuggestModal<TFile> {
         super(app);
         this.plugin = plugin;
         this.settingsTab = settingsTab;
-}
+    }
 
     getItems(): TFile[] {
         return this.app.vault.getMarkdownFiles();
@@ -23,16 +21,18 @@ class TemplateSelectionModal extends FuzzySuggestModal<TFile> {
         return file.path;
     }
 
-    onChooseItem(file: TFile, evt: MouseEvent | KeyboardEvent): void {
+    onChooseItem(file: TFile, _evt: MouseEvent | KeyboardEvent): void {
         const newTemplate: Template = {
             name: file.basename,
             path: file.path,
             fields: {}
         };
+
         this.plugin.settings.templates.push(newTemplate);
-        this.plugin.saveSettings().then(() => {
+        void (async () => {
+            await this.plugin.saveSettings();
             this.settingsTab.display();
-        });
+        })();
     }
 }
 
@@ -48,19 +48,21 @@ export class SuperAddSettingsTab extends PluginSettingTab {
         const { containerEl } = this;
         containerEl.empty();
 
-        containerEl.createEl('h2', { text: 'Super Add Settings' });
+        new Setting(containerEl)
+            .setName('Super Add Settings')
+            .setHeading();
 
         this.createCustomFieldSettings(containerEl);
         this.createTaskManagementPropertiesSettings(containerEl);
         this.createTemplateSettings(containerEl);
     }
 
-
-
-
     private createCustomFieldSettings(containerEl: HTMLElement): void {
-        containerEl.createEl('h3', { text: 'Properties' });
-        containerEl.createEl('p', { 
+        new Setting(containerEl)
+            .setName('Properties')
+            .setHeading();
+
+        containerEl.createEl('p', {
             text: 'Define properties recognized from natural language and written to frontmatter. Supports string, number, boolean, array, date, and datetime. Values parsed in the modal override template defaults.',
             cls: 'setting-item-description'
         });
@@ -69,43 +71,42 @@ export class SuperAddSettingsTab extends PluginSettingTab {
 
         const refreshCustomFields = () => {
             customFieldsContainer.empty();
-            
+
             if (this.plugin.settings.customFields.length === 0) {
                 customFieldsContainer.createEl('p', { text: 'No properties defined yet.', cls: 'no-fields-message' });
-            } else {
-                for (let i = 0; i < this.plugin.settings.customFields.length; i++) {
-                    const field = this.plugin.settings.customFields[i];
-                    const fieldEl = customFieldsContainer.createDiv('custom-field-item');
-                    
-                    const fieldName = field.name;
-                    const fieldType = field.type;
-                    const isDefault = field.isDefault ? ' (Default)' : '';
-                    const defaultValue = field.defaultValue ? ` (Default: ${field.defaultValue})` : '';
-                    
-                    new Setting(fieldEl)
-                        .setName(fieldName + isDefault)
-                        .setDesc(`Type: ${fieldType}${defaultValue}`)
-                        .addExtraButton(button => button
-                            .setIcon('pencil')
-                            .setTooltip('Edit field')
-                            .onClick(() => {
-                                this.showCustomFieldModal(field, refreshCustomFields);
-                            }))
-                        .addExtraButton(button => button
-                            .setIcon('trash')
-                            .setTooltip('Delete field')
-                            .onClick(async () => {
+                return;
+            }
+
+            for (let i = 0; i < this.plugin.settings.customFields.length; i++) {
+                const field = this.plugin.settings.customFields[i];
+                const fieldEl = customFieldsContainer.createDiv('custom-field-item');
+                const defaultLabel = field.defaultValue ? ` (Default: ${field.defaultValue})` : '';
+                const defaultFlag = field.isDefault ? ' (Default)' : '';
+
+                new Setting(fieldEl)
+                    .setName(field.name + defaultFlag)
+                    .setDesc(`Type: ${field.type}${defaultLabel}`)
+                    .addExtraButton(button => button
+                        .setIcon('pencil')
+                        .setTooltip('Edit field')
+                        .onClick(() => {
+                            this.showCustomFieldModal(field, refreshCustomFields);
+                        }))
+                    .addExtraButton(button => button
+                        .setIcon('trash')
+                        .setTooltip('Delete field')
+                        .onClick(() => {
+                            void (async () => {
                                 this.plugin.settings.customFields.splice(i, 1);
                                 await this.plugin.saveSettings();
                                 refreshCustomFields();
-                            }));
-                }
+                            })();
+                        }));
             }
         };
 
         refreshCustomFields();
-        
-        // Add button to create a new custom field
+
         new Setting(containerEl)
             .addButton(button => button
                 .setButtonText('Add Property')
@@ -116,57 +117,65 @@ export class SuperAddSettingsTab extends PluginSettingTab {
     }
 
     private showCustomFieldModal(initialField: CustomField | null, refresh: () => void): void {
-        const { app, plugin } = this;
-        new CustomFieldModal(app, plugin, initialField, refresh).open();
+        new CustomFieldModal(this.app, this.plugin, initialField, refresh).open();
     }
 
     private createTaskManagementPropertiesSettings(containerEl: HTMLElement): void {
-        containerEl.createEl('h3', { text: 'Task Management Properties' });
-        containerEl.createEl('p', { 
+        new Setting(containerEl)
+            .setName('Task Management Properties')
+            .setHeading();
+
+        containerEl.createEl('p', {
             text: 'Configure built-in properties for task management. These properties are recognized automatically in natural language input.',
             cls: 'setting-item-description'
         });
 
-        // Enable/disable toggle
         new Setting(containerEl)
             .setName('Enable Task Management Properties')
             .setDesc('Enable automatic recognition of due dates and recurrence patterns in natural language input')
             .addToggle(toggle => toggle
                 .setValue(this.plugin.settings.taskManagementProperties.enabled)
-                .onChange(async (value) => {
-                    this.plugin.settings.taskManagementProperties.enabled = value;
-                    await this.plugin.saveSettings();
-                    this.display(); // Refresh to show/hide property name fields
+                .onChange(value => {
+                    void (async () => {
+                        this.plugin.settings.taskManagementProperties.enabled = value;
+                        await this.plugin.saveSettings();
+                        this.display();
+                    })();
                 }));
 
-        // Property name fields (only shown when enabled)
         if (this.plugin.settings.taskManagementProperties.enabled) {
-            // Due property name
             new Setting(containerEl)
                 .setName('Due Property Name')
-                .setDesc('The name of the property used for due dates (e.g., "due", "deadline")')
+                .setDesc('The name of the property used for due dates (for example "due" or "deadline")')
                 .addText(text => text
                     .setPlaceholder('due')
                     .setValue(this.plugin.settings.taskManagementProperties.duePropertyName)
-                    .onChange(async (value) => {
-                        if (this.validatePropertyName(value, 'due')) {
+                    .onChange(value => {
+                        void (async () => {
+                            if (!this.validatePropertyName(value, 'due')) {
+                                return;
+                            }
+
                             this.plugin.settings.taskManagementProperties.duePropertyName = value;
                             await this.plugin.saveSettings();
-                        }
+                        })();
                     }));
 
-            // Recurrence property name
             new Setting(containerEl)
                 .setName('Recurrence Property Name')
-                .setDesc('The name of the property used for recurrence rules (e.g., "recurrence", "repeat")')
+                .setDesc('The name of the property used for recurrence rules (for example "recurrence" or "repeat")')
                 .addText(text => text
                     .setPlaceholder('recurrence')
                     .setValue(this.plugin.settings.taskManagementProperties.recurrencePropertyName)
-                    .onChange(async (value) => {
-                        if (this.validatePropertyName(value, 'recurrence')) {
+                    .onChange(value => {
+                        void (async () => {
+                            if (!this.validatePropertyName(value, 'recurrence')) {
+                                return;
+                            }
+
                             this.plugin.settings.taskManagementProperties.recurrencePropertyName = value;
                             await this.plugin.saveSettings();
-                        }
+                        })();
                     }));
         }
     }
@@ -176,8 +185,7 @@ export class SuperAddSettingsTab extends PluginSettingTab {
             return false;
         }
 
-        // Check for duplicates with custom fields
-        const isDuplicate = this.plugin.settings.customFields.some(field => 
+        const isDuplicate = this.plugin.settings.customFields.some(field =>
             field.name.toLowerCase() === name.toLowerCase()
         );
 
@@ -186,8 +194,7 @@ export class SuperAddSettingsTab extends PluginSettingTab {
             return false;
         }
 
-        // Check for duplicates between due and recurrence
-        const otherPropertyName = type === 'due' 
+        const otherPropertyName = type === 'due'
             ? this.plugin.settings.taskManagementProperties.recurrencePropertyName
             : this.plugin.settings.taskManagementProperties.duePropertyName;
 
@@ -200,25 +207,30 @@ export class SuperAddSettingsTab extends PluginSettingTab {
     }
 
     private createTemplateSettings(containerEl: HTMLElement): void {
-        containerEl.createEl('h3', { text: 'Templates' });
-        containerEl.createEl('p', { text: 'Templates are markdown files with frontmatter. All template keys are written to new notes in the same order; unfilled keys are written as empty (key:). Parsed values from the modal override template values.' });
+        new Setting(containerEl)
+            .setName('Templates')
+            .setHeading();
 
-        // Display existing templates
-        this.plugin.settings.templates.forEach((template: Template, index: number) => {
-            const templateSetting = new Setting(containerEl)
+        containerEl.createEl('p', {
+            text: 'Templates are markdown files with frontmatter. All template keys are written to new notes in the same order, and parsed values from the modal override template values.'
+        });
+
+        this.plugin.settings.templates.forEach((template, index) => {
+            new Setting(containerEl)
                 .setName(template.name)
                 .setDesc(template.path)
                 .addButton(button => button
                     .setIcon('trash')
                     .setTooltip('Delete template')
-                    .onClick(async () => {
-                        this.plugin.settings.templates.splice(index, 1);
-                        await this.plugin.saveSettings();
-                        this.display();
+                    .onClick(() => {
+                        void (async () => {
+                            this.plugin.settings.templates.splice(index, 1);
+                            await this.plugin.saveSettings();
+                            this.display();
+                        })();
                     }));
         });
 
-        // Add new template
         new Setting(containerEl)
             .setName('Add Template')
             .setDesc('Add a new template for task creation')
@@ -231,8 +243,6 @@ export class SuperAddSettingsTab extends PluginSettingTab {
     }
 
     private addTemplate(): void {
-        const modal = new TemplateSelectionModal(this.app, this.plugin, this);
-        modal.open();
-}
-
+        new TemplateSelectionModal(this.app, this.plugin, this).open();
     }
+}

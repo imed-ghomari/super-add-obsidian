@@ -1,6 +1,6 @@
 import * as chrono from 'chrono-node';
 import { RRule } from 'rrule';
-import { SuperAddSettings, CustomField } from '../settings';
+import { CustomField, FrontmatterValue, SuperAddSettings } from '../settings';
 
 export interface ParsedTaskData {
     title: string;
@@ -11,7 +11,7 @@ export interface ParsedTaskData {
     scheduledTime?: string;
     tags: string[];
     estimate?: number; // in minutes
-    customFields: Record<string, any>; // For storing custom field values
+    customFields: Record<string, FrontmatterValue>;
     template?: string;
     recurrence?: string; // For storing recurrence rules
 }
@@ -170,14 +170,14 @@ export class NaturalLanguageParser {
             } else if (field.type === 'string') {
                 // For string fields with defined values, recognize by value only
                 if (field.defaultValue) {
-                    const definedValues = field.defaultValue.split(',').map((v: string) => v.trim());
+                    const definedValues = field.defaultValue.split(',').map(v => v.trim());
                     // Process in order and find the first match
                     for (const value of definedValues) {
                         let valuePattern: RegExp;
                         if (field.useRegex) {
                             try {
                                 valuePattern = new RegExp(value, 'i');
-                            } catch (e) {
+                            } catch {
                                 // If regex is invalid, fall back to literal matching
                                 const escapedValue = value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                                 valuePattern = new RegExp(`\\b${escapedValue}\\b`, 'i');
@@ -215,7 +215,7 @@ export class NaturalLanguageParser {
             } else if (field.type === 'array') {
                 // For array fields with defined values, recognize by value only and allow multiple
                 if (field.defaultValue) {
-                    const definedValues = field.defaultValue.split(',').map((v: string) => v.trim());
+                    const definedValues = field.defaultValue.split(',').map(v => v.trim());
                     const matchedValues: string[] = [];
                     
                     for (const value of definedValues) {
@@ -223,7 +223,7 @@ export class NaturalLanguageParser {
                         if (field.useRegex) {
                             try {
                                 valuePattern = new RegExp(value, 'i');
-                            } catch (e) {
+                            } catch {
                                 // If regex is invalid, fall back to literal matching
                                 const escapedValue = value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                                 valuePattern = new RegExp(`\\b${escapedValue}\\b`, 'i');
@@ -249,7 +249,7 @@ export class NaturalLanguageParser {
                     const arrayPattern = new RegExp(`\\b${field.name}\\s+([\\w\\s,]+)\\b`, 'i');
                     const match = workingText.match(arrayPattern);
                     if (match) {
-                        result.customFields[field.name] = match[1].split(',').map(item => item.trim());
+                        result.customFields[field.name] = match[1].split(',').map((item: string) => item.trim());
                         workingText = this.cleanupWhitespace(workingText.replace(match[0], ''));
                     }
                 }

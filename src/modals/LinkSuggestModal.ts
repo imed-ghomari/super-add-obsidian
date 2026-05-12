@@ -16,7 +16,7 @@ export class LinkSuggestModal extends FuzzySuggestModal<TFile> {
         return item.basename;
     }
 
-    onChooseItem(item: TFile, evt: MouseEvent | KeyboardEvent): void {
+    onChooseItem(item: TFile, _evt: MouseEvent | KeyboardEvent): void {
         this.onSelect(item);
     }
 

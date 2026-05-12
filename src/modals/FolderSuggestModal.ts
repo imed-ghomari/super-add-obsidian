@@ -56,7 +56,7 @@ export class FolderSuggestModal extends FuzzySuggestModal<TFolder> {
         return folder.path === '/' ? '/ (root)' : folder.path;
     }
 
-    onChooseItem(folder: TFolder, evt: MouseEvent | KeyboardEvent): void {
+    onChooseItem(folder: TFolder, _evt: MouseEvent | KeyboardEvent): void {
         this.callback(folder.path);
     }
 

@@ -1,7 +1,12 @@
+export type CustomFieldType = 'string' | 'date' | 'datetime' | 'number' | 'boolean' | 'array';
+
+export type FrontmatterScalar = string | number | boolean | null;
+export type FrontmatterValue = FrontmatterScalar | FrontmatterScalar[];
+
 export interface CustomField {
 	name: string;
-	type: 'string' | 'date' | 'datetime' | 'number' | 'boolean' | 'array';
-	defaultValue?: any;
+	type: CustomFieldType;
+	defaultValue?: string;
 	isDefault?: boolean;
 	useRegex?: boolean;
 }
@@ -9,7 +14,7 @@ export interface CustomField {
 export interface Template {
 	name: string;
 	path: string;
-	fields: Record<string, any>;
+	fields: Record<string, FrontmatterValue>;
 }
 
 export interface TaskManagementProperties {

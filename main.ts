@@ -1,4 +1,4 @@
-import { Plugin, TFile, TFolder } from 'obsidian';
+import { Notice, Plugin } from 'obsidian';
 import { SuperAddSettings, DEFAULT_SETTINGS } from './src/settings';
 import { SuperAddSettingsTab } from './src/settings/SettingsTab';
 import { TaskCreationModal, TaskCreationOptions } from './src/modals/TaskCreationModal';
@@ -37,7 +37,8 @@ export default class SuperAddPlugin extends Plugin {
 	}
 
 	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+		const data = await this.loadData() as Partial<SuperAddSettings> | null;
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, data ?? {});
 	}
 
 	async saveSettings() {
@@ -70,7 +71,6 @@ export default class SuperAddPlugin extends Plugin {
 		if (isError) {
 			console.error(message);
 		}
-		// You can implement a custom notice system here if needed
-		// For now, we'll just log to console
+		new Notice(message);
 	}
 }

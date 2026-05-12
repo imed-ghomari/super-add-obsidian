@@ -1,6 +1,6 @@
 import { App, Modal, Setting, Notice } from 'obsidian';
 import SuperAddPlugin from '../../main';
-import { CustomField } from '../settings';
+import { CustomField, CustomFieldType } from '../settings';
 
 export class CustomFieldModal extends Modal {
     plugin: SuperAddPlugin;
@@ -19,8 +19,8 @@ export class CustomFieldModal extends Modal {
         contentEl.empty();
 
         let fieldName = this.initialField ? this.initialField.name : '';
-        let fieldType = this.initialField ? this.initialField.type : 'string';
-        let defaultValue = this.initialField ? this.initialField.defaultValue : '';
+        let fieldType: CustomFieldType = this.initialField ? this.initialField.type : 'string';
+        let defaultValue = this.initialField?.defaultValue ?? '';
         let useRegex = this.initialField ? this.initialField.useRegex || false : false;
 
         contentEl.createEl('h2', { text: this.initialField ? 'Edit Property' : 'Add Property' });
@@ -72,7 +72,7 @@ export class CustomFieldModal extends Modal {
                 .addOption('array', 'Tags/List')
                 .setValue(fieldType)
                 .onChange(value => {
-                    fieldType = value as 'string' | 'date' | 'datetime' | 'number' | 'boolean' | 'array';
+                    fieldType = value as CustomFieldType;
                     updateDynamicContent();
                 }));
 

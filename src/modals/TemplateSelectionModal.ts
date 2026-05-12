@@ -69,7 +69,7 @@ export class TemplateSelectionModal extends Modal {
                 path: this.selectedTemplate.path,
                 fields: {}
             });
-            this.plugin.saveSettings();
+            void this.plugin.saveSettings();
             this.close();
         }
     }
@@ -92,7 +92,7 @@ class TemplateFileSelectorModal extends FuzzySuggestModal<TFile> {
         return file.path;
     }
 
-    onChooseItem(file: TFile, evt: MouseEvent | KeyboardEvent): void {
+    onChooseItem(file: TFile, _evt: MouseEvent | KeyboardEvent): void {
         // This will be overridden by the parent modal
     }
 }

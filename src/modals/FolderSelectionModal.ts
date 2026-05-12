@@ -1,4 +1,4 @@
-import { App, Modal, Setting, TFolder, TFile, getAllTags } from 'obsidian';
+import { App, Modal, Setting, TFolder } from 'obsidian';
 import SuperAddPlugin from '../../main';
 
 export interface FolderSelectionOptions {
@@ -66,7 +66,7 @@ export class FolderSelectionModal extends Modal {
                     });
 
                 // Set initial focus
-                setTimeout(() => {
+                window.setTimeout(() => {
                     this.searchInput.focus();
                 }, 10);
             });

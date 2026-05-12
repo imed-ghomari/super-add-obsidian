@@ -2,11 +2,28 @@
 
 .super-add-input-container {
     margin-bottom: 10px;
+    width: 100%;
 }
 
-.super-add-input-container textarea {
+.super-add-task-modal .setting-item {
+    display: block;
+    border: none;
+}
+
+.super-add-task-modal .setting-item-info {
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.super-add-task-modal .setting-item-control {
+    width: 100%;
+}
+
+.super-add-input-container textarea,
+.super-add-task-input {
     width: 100%;
     min-height: 100px;
+    height: 100px;
     resize: vertical;
     font-family: var(--font-text);
     padding: 8px;
