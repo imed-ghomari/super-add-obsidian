@@ -1,8 +1,9 @@
 name: Release
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - '*'
   workflow_dispatch:
 
 permissions:
@@ -31,15 +32,13 @@ jobs:
         run: npm run build
 
       - name: Verify manifest version matches release tag
-        if: github.event_name == 'release'
         run: |
-          test "v$(node -p "require('./manifest.json').version")" = "${{ github.event.release.tag_name }}"
+          test "$(node -p "require('./manifest.json').version")" = "${{ github.ref_name }}"
 
-      - name: Upload release assets
-        if: github.event_name == 'release'
+      - name: Create GitHub release and upload assets
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.event.release.tag_name }}
+          tag_name: ${{ github.ref_name }}
           files: |
             main.js
             manifest.json
@@ -47,13 +46,11 @@ jobs:
           generate_release_notes: true
 
       - name: Attest main.js provenance
-        if: github.event_name == 'release'
         uses: actions/attest-build-provenance@v2
         with:
           subject-path: main.js
 
       - name: Attest styles.css provenance
-        if: github.event_name == 'release'
         uses: actions/attest-build-provenance@v2
         with:
           subject-path: styles.css
