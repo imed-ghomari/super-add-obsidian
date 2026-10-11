@@ -44,10 +44,28 @@ jobs:
           echo "Tag version: ${TAG_VERSION}"
           test "${MANIFEST_VERSION}" = "${TAG_VERSION}"
 
+      - name: Prepare user-oriented release notes
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          NOTES_FILE="RELEASE_NOTES_${TAG_VERSION}.md"
+          BODY_FILE="release-body.md"
+          if [ -f "$NOTES_FILE" ]; then
+            echo "Using $NOTES_FILE as release notes."
+            cp "$NOTES_FILE" "$BODY_FILE"
+          else
+            echo "No $NOTES_FILE found, using fallback notes."
+            {
+              echo "## SuperAdd ${TAG_VERSION}";
+              echo "";
+              echo "See the changelog below for details.";
+            } > "$BODY_FILE"
+          fi
+
       - name: Create GitHub release and upload assets
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
+          body_path: release-body.md
           files: |
             main.js
             manifest.json

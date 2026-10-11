@@ -1,12 +1,16 @@
-## What's Changed
+## SuperAdd 1.0.3 — more reliable preview
 
-- fixed the markdown preview renderer to use a short-lived component instead of the main plugin instance
-- renamed the top settings heading to avoid using "settings" in the heading text
-- explicitly ignored the modal superclass promise in the link suggest modal
-- tightened YAML parsing typing in the task creation modal
-- fixed preview formatting for custom frontmatter values
-- aligned the repository `manifest.json` description with the release asset description
+A small fix-up release. No new settings to learn.
 
-## Notes
+### What you'll notice
+- The **live preview is more dependable** — it no longer breaks or shows stale content while you type.
+- **Tags and list properties display correctly** in the preview (e.g. `tags: work, urgent` instead of a raw value).
+- Cleaner settings title.
 
-- this release addresses the latest Obsidian community review feedback
+### How to verify
+1. Open **SuperAdd: Create Task**.
+2. Type something with a list, e.g. `Plan trip tags beach, packing`.
+3. Check the preview shows `tags: beach, packing`.
+
+### Action needed
+None. Just update.

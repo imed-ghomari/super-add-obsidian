@@ -1,9 +1,10 @@
-## What's Changed
+## SuperAdd 1.0.2 — maintenance release
 
-- switched GitHub Actions releases to trigger automatically on pushed version tags
-- made the workflow create the GitHub release itself instead of waiting for a manual release first
-- kept build, asset upload, generated release notes, and artifact attestations in the automated flow
+No visible changes in this update.
 
-## Notes
+### What changed for you
+- Nothing to learn or reconfigure — the plugin works exactly as in 1.0.1.
+- This release fixes the automatic update delivery behind the scenes so future updates install smoothly.
 
-- this tag is intended to exercise the new automatic release workflow
+### Action needed
+None. Just update.

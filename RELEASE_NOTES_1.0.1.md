@@ -1,13 +1,14 @@
-## What's Changed
+## SuperAdd 1.0.1 — smoother and more stable
 
-- fixed Obsidian review errors around runtime style injection and direct inline style mutations
-- moved modal layout styling into `styles.css` for better theming and compatibility
-- updated settings UI to use Obsidian heading settings and cleaned up async handling
-- tightened TypeScript types to remove unsafe `any` usage across parsing, template loading, and Templater integration
-- aligned release metadata across `manifest.json`, `package.json`, and `versions.json`
-- replaced `builtin-modules` with Node's built-in `module` API in the build config
-- added a GitHub Actions release workflow that uploads assets, generates release notes, and creates artifact attestations
+Same features, now works better with your setup. No action needed — just update.
 
-## Compatibility
+### What you'll notice
+- The **Create Task window respects your theme** — no more odd styling or layout glitches.
+- **Settings are clearer** with proper section headings.
+- More reliable overall: fewer hiccups when creating tasks, applying templates, or previewing.
 
-- bumped `minAppVersion` to `1.4.0` to match the Obsidian APIs used by the plugin
+### How to use
+Nothing new to learn. Open **SuperAdd: Create Task** as before.
+
+### Compatibility
+- Requires Obsidian 1.4.0 or newer.

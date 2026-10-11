@@ -1,10 +1,10 @@
-## What's Changed
+## SuperAdd 1.0.4 — maintenance release
 
-- updated the GitHub Actions release workflow to use `actions/checkout@v6` and `actions/setup-node@v6`
-- moved the workflow to Node 24-compatible action runtimes
-- made the release version check print both manifest and tag versions for easier debugging
-- normalized the tag comparison so both `1.0.4` and `v1.0.4` style tags work
+No visible changes in this update.
 
-## Notes
+### What changed for you
+- Nothing to learn or reconfigure — the plugin works exactly as in 1.0.3.
+- This release repairs the automatic release delivery so updates download correctly.
 
-- this release is intended to fix the failed automatic release workflow from `1.0.3`
+### Action needed
+None. Just update.
