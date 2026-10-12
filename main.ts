@@ -67,10 +67,7 @@ export default class SuperAddPlugin extends Plugin {
 	/**
 	 * Shows a notice to the user.
 	 */
-	showNotice(message: string, isError: boolean = false) {
-		if (isError) {
-			console.error(message);
-		}
+	showNotice(message: string) {
 		new Notice(message);
 	}
 }

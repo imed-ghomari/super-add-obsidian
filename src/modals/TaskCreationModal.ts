@@ -116,7 +116,7 @@ export class TaskCreationModal extends Modal {
         const previewContainer = container.createDiv({ cls: 'super-add-preview-container' });
         previewContainer.createEl('h3', { text: 'Preview' });
         this.previewEl = previewContainer.createDiv({ cls: 'super-add-preview' });
-        this.previewEl.createEl('div', {
+        this.previewEl.createDiv({
             text: 'Enter task description to see preview',
             cls: 'super-add-preview-placeholder'
         });
@@ -150,7 +150,6 @@ export class TaskCreationModal extends Modal {
         try {
             const file = this.app.vault.getAbstractFileByPath(template.path);
             if (!(file instanceof TFile)) {
-                console.error('Template file not found:', template.path);
                 return;
             }
 
@@ -165,15 +164,16 @@ export class TaskCreationModal extends Modal {
             const parsed: unknown = parseYaml(frontmatterMatch[1]);
             this.templateData = this.toFrontmatterRecord(parsed);
             this.templateFields = Object.keys(this.templateData);
-        } catch (error: unknown) {
-            console.error('Error loading template data:', error);
+        } catch {
+            this.templateData = {};
+            this.templateFields = [];
         }
     }
 
     private async updatePreview(input: string) {
         if (!input) {
             this.previewEl.empty();
-            this.previewEl.createEl('div', {
+            this.previewEl.createDiv({
                 text: 'Enter task description to see preview',
                 cls: 'super-add-preview-placeholder'
             });
@@ -183,12 +183,12 @@ export class TaskCreationModal extends Modal {
         this.parsedData = this.nlpParser.parseInput(input);
         this.previewEl.empty();
 
-        const titleEl = this.previewEl.createEl('div', { cls: 'super-add-preview-title' });
+        const titleEl = this.previewEl.createDiv({ cls: 'super-add-preview-title' });
         titleEl.createEl('strong', { text: 'Title: ' });
         titleEl.createSpan({ text: this.parsedData.title || '(No title)' });
 
         if (this.parsedData.details) {
-            const detailsEl = this.previewEl.createEl('div', { cls: 'super-add-preview-details' });
+            const detailsEl = this.previewEl.createDiv({ cls: 'super-add-preview-details' });
             detailsEl.createEl('strong', { text: 'Details: ' });
             const detailsContent = detailsEl.createDiv({ cls: 'super-add-preview-details-content' });
             await MarkdownRenderer.render(this.app, this.parsedData.details, detailsContent, '', this.markdownComponent);
@@ -336,8 +336,7 @@ export class TaskCreationModal extends Modal {
                 initialFolder: this.options.folder || this.plugin.settings.defaultFolder
             }).open();
         } catch (error: unknown) {
-            console.error('Error creating task:', error);
-            this.plugin.showNotice(`Error creating task: ${this.getErrorMessage(error)}`, true);
+            this.plugin.showNotice(`Error creating task: ${this.getErrorMessage(error)}`);
         }
     }
 
@@ -411,8 +410,7 @@ export class TaskCreationModal extends Modal {
 
             await this.app.workspace.getLeaf(true).openFile(file);
         } catch (error: unknown) {
-            console.error('Error creating file:', error);
-            this.plugin.showNotice(`Error creating file: ${this.getErrorMessage(error)}`, true);
+            this.plugin.showNotice(`Error creating file: ${this.getErrorMessage(error)}`);
         }
     }
 
@@ -502,7 +500,6 @@ export class TaskCreationModal extends Modal {
             const templaterPlugin = (this.app as AppWithPlugins).plugins?.plugins?.['templater-obsidian'];
 
             if (!templaterPlugin?.templater) {
-                console.log('Templater plugin not found or not enabled');
                 return;
             }
 
@@ -511,9 +508,8 @@ export class TaskCreationModal extends Modal {
             });
 
             await templaterPlugin.templater.overwrite_file_commands(file);
-            console.log('Templater execution triggered for file:', file.path);
-        } catch (error: unknown) {
-            console.error('Error triggering Templater execution:', error);
+        } catch {
+            // Templater execution is best-effort; the task file is already created.
         }
     }
 
@@ -523,7 +519,7 @@ export class TaskCreationModal extends Modal {
         }
 
         const record: Record<string, FrontmatterValue> = {};
-        for (const [key, entry] of Object.entries(value)) {
+        for (const [key, entry] of Object.entries(value as Record<string, unknown>)) {
             if (this.isFrontmatterValue(entry)) {
                 record[key] = entry;
             }

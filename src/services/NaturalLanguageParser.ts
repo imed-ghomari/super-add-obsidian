@@ -515,8 +515,8 @@ export class NaturalLanguageParser {
                 if (parsed.recurrence.includes('FREQ=') && this.isValidRRuleString(parsed.recurrence)) {
                     recurrenceText = RRule.fromString(parsed.recurrence).toText();
                 }
-            } catch (error) {
-                console.debug('Error parsing rrule for preview:', error);
+            } catch {
+                // Keep the 'Invalid recurrence' fallback text.
             }
             previewItems.push({ text: `Recurrence: ${recurrenceText}` });
         }

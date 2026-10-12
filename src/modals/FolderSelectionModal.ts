@@ -154,16 +154,16 @@ export class FolderSelectionModal extends Modal {
         this.folderList.empty();
 
         if (this.filteredFolders.length === 0) {
-            this.folderList.createEl('div', { 
-                text: 'No folders found', 
-                cls: 'folder-empty-message' 
+            this.folderList.createDiv({
+                text: 'No folders found',
+                cls: 'folder-empty-message'
             });
             return;
         }
 
         for (const folder of this.filteredFolders) {
-            const folderItem = this.folderList.createEl('div', { 
-                cls: 'folder-list-item' 
+            const folderItem = this.folderList.createDiv({
+                cls: 'folder-list-item'
             });
 
             // Add selected class if this is the selected folder
@@ -173,7 +173,7 @@ export class FolderSelectionModal extends Modal {
 
             // Display folder name
             const displayName = folder === '/' ? 'Root' : folder;
-            folderItem.createEl('span', { text: displayName });
+            folderItem.createSpan({ text: displayName });
 
             // Add click handler
             folderItem.addEventListener('click', () => {
