@@ -1,4 +1,5 @@
 import * as chrono from 'chrono-node';
+import type { ParsedResult } from 'chrono-node';
 import { RRule } from 'rrule';
 import { CustomField, FrontmatterValue, SuperAddSettings } from '../settings';
 
@@ -419,7 +420,7 @@ export class NaturalLanguageParser {
             // Check for 'due <date pattern>' first
             const duePattern = /due\s+(.+)/i;
             const dueMatch = workingText.match(duePattern);
-            let chronoResults;
+            let chronoResults: ParsedResult[];
 
             if (dueMatch) {
                 chronoResults = chrono.parse(dueMatch[1]);
@@ -432,8 +433,8 @@ export class NaturalLanguageParser {
                 chronoResults.sort((a, b) => b.index - a.index);
                 
                 // Process the first remaining date as the due date
-                const firstDate = chronoResults[0];
-                const date = firstDate.start.date();
+                const firstDate: ParsedResult = chronoResults[0];
+                const date: Date = firstDate.start.date();
                 
                 // Format date as YYYY-MM-DD
                 const formattedDate = date.toISOString().split('T')[0];
@@ -523,7 +524,8 @@ export class NaturalLanguageParser {
 
         // Custom fields
         if (parsed.customFields && Object.keys(parsed.customFields).length > 0) {
-            for (const [fieldName, fieldValue] of Object.entries(parsed.customFields)) {
+            for (const fieldName of Object.keys(parsed.customFields)) {
+                const fieldValue: FrontmatterValue = parsed.customFields[fieldName];
                 const fieldText = Array.isArray(fieldValue) ? fieldValue.join(', ') : String(fieldValue);
                 previewItems.push({ text: `${fieldName}: ${fieldText}` });
             }

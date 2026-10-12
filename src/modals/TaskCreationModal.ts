@@ -243,7 +243,8 @@ export class TaskCreationModal extends Modal {
             }
         }
 
-        for (const [fieldName, fieldValue] of Object.entries(this.parsedData.customFields)) {
+        for (const fieldName of Object.keys(this.parsedData.customFields)) {
+            const fieldValue: FrontmatterValue = this.parsedData.customFields[fieldName];
             const isInTemplate = allProperties.some(property => property.key === fieldName && property.isTemplate);
             if (!isInTemplate && this.hasValue(fieldValue)) {
                 allProperties.push({
@@ -344,7 +345,8 @@ export class TaskCreationModal extends Modal {
         try {
             const frontmatter: Record<string, FrontmatterValue> = {};
 
-            for (const [fieldName, fieldValue] of Object.entries(this.parsedData.customFields)) {
+            for (const fieldName of Object.keys(this.parsedData.customFields)) {
+                const fieldValue: FrontmatterValue = this.parsedData.customFields[fieldName];
                 if (this.hasValue(fieldValue)) {
                     frontmatter[fieldName] = fieldValue;
                 }
@@ -384,7 +386,8 @@ export class TaskCreationModal extends Modal {
             }
 
             if (this.selectedTemplate && Object.keys(this.templateData).length > 0) {
-                for (const [field, value] of Object.entries(this.templateData)) {
+                for (const field of Object.keys(this.templateData)) {
+                    const value: FrontmatterValue = this.templateData[field];
                     if (frontmatter[field] === undefined) {
                         frontmatter[field] = this.normalizeTemplateValue(value);
                     }
@@ -434,7 +437,8 @@ export class TaskCreationModal extends Modal {
             }
         }
 
-        for (const [key, value] of Object.entries(frontmatter)) {
+        for (const key of Object.keys(frontmatter)) {
+            const value: FrontmatterValue = frontmatter[key];
             if (!this.templateFields.includes(key)) {
                 orderedFrontmatter[key] = value;
             }
@@ -446,7 +450,8 @@ export class TaskCreationModal extends Modal {
     private generateYamlFrontmatter(data: Record<string, FrontmatterValue>): string {
         const lines: string[] = [];
 
-        for (const [key, value] of Object.entries(data)) {
+        for (const key of Object.keys(data)) {
+            const value: FrontmatterValue = data[key];
             if (value === undefined) {
                 continue;
             }
@@ -514,17 +519,22 @@ export class TaskCreationModal extends Modal {
     }
 
     private toFrontmatterRecord(value: unknown): Record<string, FrontmatterValue> {
-        if (!value || typeof value !== 'object' || Array.isArray(value)) {
-            return {};
+        const record: Record<string, FrontmatterValue> = {};
+        if (!this.isRecord(value)) {
+            return record;
         }
 
-        const record: Record<string, FrontmatterValue> = {};
-        for (const [key, entry] of Object.entries(value as Record<string, unknown>)) {
+        for (const key of Object.keys(value)) {
+            const entry: unknown = value[key];
             if (this.isFrontmatterValue(entry)) {
                 record[key] = entry;
             }
         }
         return record;
+    }
+
+    private isRecord(value: unknown): value is Record<string, unknown> {
+        return typeof value === 'object' && value !== null && !Array.isArray(value);
     }
 
     private isFrontmatterValue(value: unknown): value is FrontmatterValue {
