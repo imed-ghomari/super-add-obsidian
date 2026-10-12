@@ -3,6 +3,14 @@ import type { ParsedResult } from 'chrono-node';
 import { RRule } from 'rrule';
 import { CustomField, FrontmatterValue, SuperAddSettings } from '../settings';
 
+/**
+ * Zero-pads a number to two digits without relying on ES2017 String.padStart,
+ * so the code type-checks against older lib targets as well.
+ */
+function pad2(n: number): string {
+    return n < 10 ? `0${n}` : `${n}`;
+}
+
 export interface ParsedTaskData {
     title: string;
     details?: string;
@@ -442,8 +450,8 @@ export class NaturalLanguageParser {
                 // Format time as HH:MM if present
                 let formattedTime: string | undefined;
                 if (firstDate.start.isCertain('hour')) {
-                    const hours = date.getHours().toString().padStart(2, '0');
-                    const minutes = date.getMinutes().toString().padStart(2, '0');
+                    const hours = pad2(date.getHours());
+                    const minutes = pad2(date.getMinutes());
                     formattedTime = `${hours}:${minutes}`;
                 }
                 
