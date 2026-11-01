@@ -2,7 +2,7 @@ import { App, ButtonComponent, Component, MarkdownRenderer, Modal, Setting, Text
 import SuperAddPlugin from '../../main';
 import { FolderSuggestModal } from './FolderSuggestModal';
 import { LinkSuggestModal } from './LinkSuggestModal';
-import { ParsedTaskData, NaturalLanguageParser } from '../services/NaturalLanguageParser';
+import { ParsedSpan, ParsedTaskData, ParsedTaskResult, NaturalLanguageParser } from '../services/NaturalLanguageParser';
 import { FrontmatterScalar, FrontmatterValue, Template } from '../settings';
 
 interface TemplaterPlugin {
@@ -41,6 +41,7 @@ export class TaskCreationModal extends Modal {
     private templateData: Record<string, FrontmatterValue> = {};
     private templateFields: string[] = [];
     private inputEl!: TextAreaComponent;
+    private highlightEl!: HTMLElement;
     private markdownComponent = new Component();
 
     constructor(app: App, plugin: SuperAddPlugin, options: TaskCreationOptions = {}) {
@@ -74,7 +75,11 @@ export class TaskCreationModal extends Modal {
         const inputContainer = container.createDiv({ cls: 'super-add-input-container' });
         const setting = new Setting(inputContainer).setName('Task Description');
 
-        this.inputEl = new TextAreaComponent(setting.controlEl);
+        const inputWrapper = setting.controlEl.createDiv({ cls: 'super-add-input-wrapper' });
+        this.highlightEl = inputWrapper.createDiv({ cls: 'super-add-highlight-layer' });
+        this.highlightEl.setAttribute('aria-hidden', 'true');
+
+        this.inputEl = new TextAreaComponent(inputWrapper);
         this.inputEl.inputEl.addClass('super-add-task-input');
         this.inputEl
             .setPlaceholder(this.options.placeholder ?? 'E.g., Call John about project tomorrow at 3pm -link to file property value...')
@@ -82,6 +87,10 @@ export class TaskCreationModal extends Modal {
             .onChange(value => {
                 void this.updatePreview(value);
             });
+
+        this.inputEl.inputEl.addEventListener('scroll', () => {
+            this.syncHighlightScroll();
+        });
 
         this.inputEl.inputEl.addEventListener('keydown', (event: KeyboardEvent) => {
             if (event.key !== '-') {
@@ -172,6 +181,7 @@ export class TaskCreationModal extends Modal {
 
     private async updatePreview(input: string) {
         if (!input) {
+            this.clearHighlight();
             this.previewEl.empty();
             this.previewEl.createDiv({
                 text: 'Enter task description to see preview',
@@ -180,7 +190,9 @@ export class TaskCreationModal extends Modal {
             return;
         }
 
-        this.parsedData = this.nlpParser.parseInput(input);
+        const parsed = this.parseInput(input);
+        this.parsedData = parsed.data;
+        this.renderHighlight(input, parsed.spans);
         this.previewEl.empty();
 
         const titleEl = this.previewEl.createDiv({ cls: 'super-add-preview-title' });
@@ -204,6 +216,66 @@ export class TaskCreationModal extends Modal {
         }
 
         this.createUnifiedPreview();
+    }
+
+    private parseInput(input: string): ParsedTaskResult {
+        return this.nlpParser.parseInputWithSpans(input);
+    }
+
+    private renderHighlight(input: string, spans: ParsedSpan[]) {
+        this.highlightEl.empty();
+        if (!input || spans.length === 0) {
+            this.syncHighlightScroll();
+            return;
+        }
+
+        let cursor = 0;
+        let lastEnd = 0;
+
+        for (const span of spans) {
+            if (span.start < lastEnd || span.end <= span.start || span.end > input.length) {
+                continue;
+            }
+
+            if (span.start > cursor) {
+                this.highlightEl.appendText(input.substring(cursor, span.start));
+            }
+
+            this.highlightEl.createSpan({
+                cls: `super-add-highlight super-add-highlight--${span.kind}`,
+                text: input.substring(span.start, span.end)
+            });
+
+            cursor = span.end;
+            lastEnd = span.end;
+        }
+
+        if (cursor < input.length) {
+            this.highlightEl.appendText(input.substring(cursor));
+        }
+
+        // Keep a trailing newline visible so the layer has the same height as
+        // the textarea when the caret is on a new, empty line.
+        if (input.endsWith('\n')) {
+            this.highlightEl.appendText(' ');
+        }
+
+        this.syncHighlightScroll();
+    }
+
+    private clearHighlight() {
+        if (this.highlightEl) {
+            this.highlightEl.empty();
+        }
+    }
+
+    private syncHighlightScroll() {
+        if (!this.highlightEl || !this.inputEl) {
+            return;
+        }
+
+        this.highlightEl.scrollTop = this.inputEl.inputEl.scrollTop;
+        this.highlightEl.scrollLeft = this.inputEl.inputEl.scrollLeft;
     }
 
     private createUnifiedPreview() {

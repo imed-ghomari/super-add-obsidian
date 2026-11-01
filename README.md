@@ -11,6 +11,7 @@ Create richly structured tasks from a single natural language line. SuperAdd rec
   - Properties filled via the modal/NLP override the template.
   - Unfilled template properties are written as `key:` (null).
   - The frontmatter order matches the template order; non-template keys are appended.
+- **Recognized text highlighting**: see dates, recurrence, templates, and your custom properties highlighted as you type.
 - **Live preview** with pill-style property display.
 - **Quick link insertion**: type `-` to open a file picker and insert `[[links]]`.
 
@@ -25,6 +26,19 @@ Create richly structured tasks from a single natural language line. SuperAdd rec
 - “Due” uses a robust NLP pass (e.g., “tomorrow”, “in 2 days evening”).
 - Custom date/datetime properties use the same recognition and reset correctly afterward.
 - Recurrence is recognized from natural phrases (e.g., “every week”, “every second Monday”) into RRULE.
+
+### Recognized text highlighting
+As you type in the task description, SuperAdd highlights each recognized part without changing the text or taking away normal editing:
+
+- **Due and scheduled dates** in blue.
+- **Recurrence** in purple.
+- **Status** in green.
+- **Priority** in red, when configured.
+- **Time estimates** in orange.
+- **Template names** in cyan.
+- **Other custom properties** in the accent color.
+
+Highlighting follows the same parser that builds the saved task, including custom properties, templates, regex values, and repeated values such as `context inside pc, outside pc`.
 
 ## Configuration
 
