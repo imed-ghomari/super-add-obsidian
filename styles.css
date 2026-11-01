@@ -44,6 +44,7 @@
     font-family: var(--font-text);
     font-size: var(--font-ui-medium);
     line-height: var(--line-height-normal);
+    text-align: start;
     padding: 8px;
     border-radius: 4px;
     border: 1px solid var(--background-modifier-border);
@@ -84,6 +85,7 @@
     font-family: var(--font-text);
     font-size: var(--font-ui-medium);
     line-height: var(--line-height-normal);
+    text-align: start;
     scrollbar-gutter: stable;
 }
 
